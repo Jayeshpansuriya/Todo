@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        /* Gradient Background */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+        }
+
+        h1 {
+            color: #000000;
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .todo-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .todo-list-elem {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .main_todo_div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            color: #333;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .main_todo_div:hover {
+            background-color: #f4f4f4;
+            transform: scale(1.05);
+        }
+
+        .main_todo_div li {
+            font-size: 1.2em;
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .delete {
+            background-color: #ff4f58;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete:hover {
+            background-color: #e03e46;
+        }
+
+        .input-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex-grow: 1; /* Make input take up the remaining space */
+            font-size: 1em;
+            margin-right: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #feb47b;
+        }
+
+        .btn {
+            padding: 12px;
+            background-color: #feb47b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #ff7e5f;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+        }
+        p {
+            text-align: center;
+            margin-top: 20px;
+            color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="todo-container">
+        <h1>Todo List</h1>
+        <p>Jayesh Pansuriya</p>
+
+        <form>
+            <div class="input-container">
+                <input type="text" id="inputvalue" placeholder="Add a new task" />
+                <button class="btn" type="button">Add Todo</button>
+            </div>
+            <section class="todo-list-elem"></section>
+        </form>
+    </div>
+
+    <script>
+        const mainTodoElem = document.querySelector(".todo-list-elem");
+        const inputvalue = document.getElementById("inputvalue");
+
+        // Fetch the todo list from localStorage
+        const getTodoList = () => {
+            return JSON.parse(localStorage.getItem("youtubeTodoList"));
+        };
+
+        let localTodoList = getTodoList() || [];
+
+        // Function to add a new todo item dynamically
+        const addTodoDynamicElement = (curElem) => {
+            const divElement = document.createElement("div");
+            divElement.classList.add("main_todo_div");
+            divElement.innerHTML = `
+                <li>${curElem}</li>
+                <button class="delete">Delete</button>
+            `;
+            // Append the new todo item to the list
+            mainTodoElem.appendChild(divElement);
+
+            // Add functionality to delete the todo item
+            const deleteButton = divElement.querySelector(".delete");
+            deleteButton.addEventListener("click", () => {
+                const index = localTodoList.indexOf(curElem);
+                if (index > -1) {
+                    localTodoList.splice(index, 1);
+                    localStorage.setItem("youtubeTodoList", JSON.stringify(localTodoList));
+                    divElement.remove();
+                }
+            });
+        };
+
+        // Add new todo item to the list and update localStorage
+        const addTodoList = (e) => {
+            e.preventDefault();
+            const todoListvalue = inputvalue.value.trim();
+
+            if (todoListvalue === "") return;  // Do nothing if input is empty
+
+            // Check if the todo item already exists in the list
+            if (localTodoList.includes(todoListvalue)) {
+                alert("This task already exists in the list!");
+                return;  // Don't add it if it's already in the list
+            }
+
+            // Add todo to the localTodoList and localStorage
+            localTodoList.push(todoListvalue);
+            localTodoList = [...new Set(localTodoList)];  // Remove duplicates
+            localStorage.setItem("youtubeTodoList", JSON.stringify(localTodoList));
+
+            // Add the todo item dynamically to the UI
+            addTodoDynamicElement(todoListvalue);
+            inputvalue.value = "";  // Clear the input field after adding
+        };
+
+        // Show the existing todo list on page load
+        const showTodoList = () => {
+            localTodoList.forEach((curElem) => {
+                addTodoDynamicElement(curElem);
+            });
+        };
+
+        showTodoList();  // Display todo items when the page loads
+
+        document.querySelector(".btn").addEventListener("click", addTodoList);
+    </script>
+</body>
+</html>
