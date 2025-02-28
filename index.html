@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo List</title>
     <style>
-        /* Gradient Background */
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(to right, #ff7e5f, #feb47b);
@@ -91,7 +90,7 @@
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            flex-grow: 1; /* Make input take up the remaining space */
+            flex-grow: 1;
             font-size: 1em;
             margin-right: 10px;
             transition: border-color 0.3s ease;
@@ -122,6 +121,7 @@
         .btn:active {
             transform: translateY(2px);
         }
+
         p {
             text-align: center;
             margin-top: 20px;
@@ -147,14 +147,12 @@
         const mainTodoElem = document.querySelector(".todo-list-elem");
         const inputvalue = document.getElementById("inputvalue");
 
-        // Fetch the todo list from localStorage
         const getTodoList = () => {
             return JSON.parse(localStorage.getItem("youtubeTodoList"));
         };
 
         let localTodoList = getTodoList() || [];
 
-        // Function to add a new todo item dynamically
         const addTodoDynamicElement = (curElem) => {
             const divElement = document.createElement("div");
             divElement.classList.add("main_todo_div");
@@ -162,10 +160,8 @@
                 <li>${curElem}</li>
                 <button class="delete">Delete</button>
             `;
-            // Append the new todo item to the list
             mainTodoElem.appendChild(divElement);
 
-            // Add functionality to delete the todo item
             const deleteButton = divElement.querySelector(".delete");
             deleteButton.addEventListener("click", () => {
                 const index = localTodoList.indexOf(curElem);
@@ -177,39 +173,40 @@
             });
         };
 
-        // Add new todo item to the list and update localStorage
         const addTodoList = (e) => {
             e.preventDefault();
             const todoListvalue = inputvalue.value.trim();
 
-            if (todoListvalue === "") return;  // Do nothing if input is empty
+            if (todoListvalue === "") return;
 
-            // Check if the todo item already exists in the list
             if (localTodoList.includes(todoListvalue)) {
                 alert("This task already exists in the list!");
-                return;  // Don't add it if it's already in the list
+                return;
             }
 
-            // Add todo to the localTodoList and localStorage
             localTodoList.push(todoListvalue);
-            localTodoList = [...new Set(localTodoList)];  // Remove duplicates
+            localTodoList = [...new Set(localTodoList)];
             localStorage.setItem("youtubeTodoList", JSON.stringify(localTodoList));
 
-            // Add the todo item dynamically to the UI
             addTodoDynamicElement(todoListvalue);
-            inputvalue.value = "";  // Clear the input field after adding
+            inputvalue.value = "";
         };
 
-        // Show the existing todo list on page load
         const showTodoList = () => {
             localTodoList.forEach((curElem) => {
                 addTodoDynamicElement(curElem);
             });
         };
 
-        showTodoList();  // Display todo items when the page loads
+        showTodoList();
 
         document.querySelector(".btn").addEventListener("click", addTodoList);
+
+        inputvalue.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                addTodoList(e);
+            }
+        });
     </script>
 </body>
 </html>
